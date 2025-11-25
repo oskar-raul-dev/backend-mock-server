@@ -1,0 +1,29 @@
+{
+    "count": 3,
+    "results": [
+        {
+            "id": 1,
+            "title": "Bienvenido a Granja",
+            "description": "Los mejores productos frescos",
+            "image": "https://via.placeholder.com/800x400",
+            "link": "/",
+            "order": 1
+        },
+        {
+            "id": 2,
+            "title": "Ofertas Semanales",
+            "description": "Aprovecha nuestras promociones",
+            "image": "https://via.placeholder.com/800x400",
+            "link": "/ofertas",
+            "order": 2
+        },
+        {
+            "id": 3,
+            "title": "Delivery Gratis",
+            "description": "En compras mayores a $20",
+            "image": "https://via.placeholder.com/800x400",
+            "link": "/delivery",
+            "order": 3
+        }
+    ]
+}

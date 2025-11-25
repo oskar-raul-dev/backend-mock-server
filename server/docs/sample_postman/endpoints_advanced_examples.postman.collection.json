@@ -1,0 +1,459 @@
+{
+	"info": {
+		"_postman_id": "mockserver-advanced-examples",
+		"name": "MockServer - Advanced Examples",
+		"description": "Collection of advanced mockserver examples demonstrating:\n\n**XML Examples with Validators and Processors:**\n- Email and age validation with custom error messages\n- Order calculations with status validation\n- Currency conversion with payment processing\n\n**JSON Examples with Validators and Processors:**\n- Product data validation with SKU format checking\n- Partial matching mode (allows extra fields)\n- Complex checkout calculations with tax and totals\n\n**Key Features:**\n- Semantic body matching (format-aware comparison)\n- Custom validator functions (raises ValueError on failure)\n- Custom processor functions (extracts/transforms data)\n- Template variables: BODY_PROCESSED contains processor output\n- Multi-field validation with detailed error messages\n- Data generation (IDs, timestamps, calculations)\n\n**Starting the Server:**\n```bash\npython main.py --config-dir config --endpoints-file endpoints_advanced_examples.py\n```\n\n**Server URL:** http://localhost:9090\n\n**Health Check:** http://localhost:9090/_health",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "XML Example 1: Create User with Validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response has success field\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.createUserResponse.success).to.eql('true');",
+							"});",
+							"",
+							"pm.test(\"User ID is generated\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.createUserResponse.user.id).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Age group is assigned\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.createUserResponse.user.ageGroup).to.be.oneOf(['young_adult', 'adult', 'middle_aged', 'senior']);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<createUserRequest>\n    <user>\n        <firstName>John</firstName>\n        <lastName>Doe</lastName>\n        <email>john.doe@example.com</email>\n        <age>30</age>\n    </user>\n    <metadata>\n        <source>web</source>\n    </metadata>\n</createUserRequest>"
+				},
+				"url": {
+					"raw": "http://localhost:9090/api/users/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"users",
+						"create"
+					]
+				},
+				"description": "XML endpoint with semantic matching that validates email format and age range (18-120). Processor generates user ID from email hash and categorizes users by age group.\n\n**Validator Logic:**\n- Email validation (must contain @ and .)\n- Age validation (18-120 years)\n- Required field checking\n\n**Processor Logic:**\n- Auto-generated user ID (MD5 hash of email)\n- Full name composition (firstName + lastName)\n- Age-based grouping:\n  - young_adult: < 25\n  - adult: 25-39\n  - middle_aged: 40-59\n  - senior: >= 60\n- Timestamp generation\n\n**Expected Response:**\n```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<createUserResponse>\n    <success>true</success>\n    <user>\n        <id>6579DA5F</id>\n        <firstName>John</firstName>\n        <lastName>Doe</lastName>\n        <email>john.doe@example.com</email>\n        <fullName>John Doe</fullName>\n        <ageGroup>adult</ageGroup>\n        <createdAt>2024-11-23T22:30:00.123456</createdAt>\n    </user>\n    <metadata>\n        <source>web</source>\n        <processedBy>mockserver</processedBy>\n    </metadata>\n</createUserResponse>\n```\n\n**Try these variations:**\n- Young adult (age < 25)\n- Senior (age >= 60)\n- Invalid email (missing @ or .)\n- Invalid age (< 18 or > 120)"
+			},
+			"response": []
+		},
+		{
+			"name": "XML Example 2: Update Order with Calculations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has success field\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.updateOrderResponse.success).to.eql('true');",
+							"});",
+							"",
+							"pm.test(\"Total items calculated\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.updateOrderResponse.order.totalItems).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Total amount calculated\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.updateOrderResponse.order.totalAmount).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Estimated delivery set\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.updateOrderResponse.order.estimatedDelivery).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<updateOrderRequest>\n    <order>\n        <orderId>12345</orderId>\n        <status>pending</status>\n        <items>\n            <item>\n                <productId>101</productId>\n                <quantity>1</quantity>\n                <price>10.00</price>\n            </item>\n        </items>\n    </order>\n</updateOrderRequest>"
+				},
+				"url": {
+					"raw": "http://localhost:9090/api/orders/update",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"orders",
+						"update"
+					]
+				},
+				"description": "XML endpoint that validates order status and calculates totals. Processor computes item count, total amount, and estimates delivery date based on order status.\n\n**Validator Logic:**\n- Status validation (pending, processing, completed, cancelled)\n- At least one item required\n- Positive quantity and price validation\n\n**Processor Logic:**\n- Item count calculation\n- Total amount calculation (quantity × price for all items)\n- Delivery date estimation:\n  - pending: +7 days\n  - processing: +3 days\n  - completed: today\n  - cancelled: N/A\n\n**Expected Response:**\n```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<updateOrderResponse>\n    <success>true</success>\n    <order>\n        <orderId>12345</orderId>\n        <status>pending</status>\n        <totalItems>1</totalItems>\n        <totalAmount>10.00</totalAmount>\n        <estimatedDelivery>2024-11-30</estimatedDelivery>\n    </order>\n    <message>Order 12345 updated to pending</message>\n</updateOrderResponse>\n```\n\n**Try these variations:**\n- Different statuses (pending, completed, cancelled)\n- Invalid status (should fail validation)\n- Zero or negative quantities (should fail validation)"
+			},
+			"response": []
+		},
+		{
+			"name": "XML Example 3: Payment with Currency Conversion",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has success field\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.paymentResponse.success).to.eql('true');",
+							"});",
+							"",
+							"pm.test(\"Amount in VES calculated\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.paymentResponse.transaction.amountInVES).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Conversion rate provided\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.paymentResponse.transaction.conversionRate).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Processing fee calculated\", function () {",
+							"    var xmlData = xml2Json(pm.response.text());",
+							"    pm.expect(xmlData.paymentResponse.transaction.processingFee).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/xml",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<paymentNotification>\n    <transaction>\n        <transactionId>ABC1234567890</transactionId>\n        <amount>100.00</amount>\n        <currency>USD</currency>\n        <status>approved</status>\n        <customer>\n            <customerId>12345</customerId>\n            <email>customer@example.com</email>\n        </customer>\n    </transaction>\n</paymentNotification>"
+				},
+				"url": {
+					"raw": "http://localhost:9090/api/payments/notify",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"payments",
+						"notify"
+					]
+				},
+				"description": "XML endpoint that validates payment data and performs currency conversion. Processor converts amounts to VES and calculates processing fees.\n\n**Validator Logic:**\n- Currency validation (USD, EUR, VES)\n- Amount validation (positive numbers)\n- Status validation (approved, pending, rejected)\n\n**Processor Logic:**\n- Currency conversion to VES (using mock exchange rates):\n  - USD: 36.50\n  - EUR: 40.20\n  - VES: 1.00\n- Processing fee calculation (2.5% of amount)\n- Status-based message generation\n- Timestamp generation\n\n**Expected Response:**\n```xml\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<paymentResponse>\n    <success>true</success>\n    <transaction>\n        <transactionId>ABC1234567890</transactionId>\n        <status>approved</status>\n        <amount>100.00</amount>\n        <currency>USD</currency>\n        <amountInVES>3650.00</amountInVES>\n        <conversionRate>36.50</conversionRate>\n        <processingFee>2.50</processingFee>\n        <customerId>12345</customerId>\n        <processedAt>2024-11-23T22:30:00.123456</processedAt>\n    </transaction>\n    <message>Payment of USD 100.00 approved successfully</message>\n</paymentResponse>\n```\n\n**Try these variations:**\n- EUR currency\n- Different statuses (pending, rejected)\n- Invalid currency (should fail validation)\n- Zero or negative amount (should fail validation)"
+			},
+			"response": []
+		},
+		{
+			"name": "JSON Example 4: Create Product with Validation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test(\"Response has success field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Product ID is generated\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.product.id).to.exist;",
+							"    pm.expect(jsonData.product.id).to.match(/^PRD-\\d+$/);",
+							"});",
+							"",
+							"pm.test(\"Price is formatted\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.product.priceFormatted).to.exist;",
+							"    pm.expect(jsonData.product.priceFormatted).to.match(/^\\$\\d+\\.\\d{2} USD$/);",
+							"});",
+							"",
+							"pm.test(\"Stock availability is set\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.product.inStock).to.be.a('boolean');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"product\": {\n        \"name\": \"Sample Product\",\n        \"sku\": \"PROD123\",\n        \"price\": \"29.99\",\n        \"category\": \"electronics\",\n        \"stock\": \"100\"\n    },\n    \"metadata\": {\n        \"source\": \"api\",\n        \"timestamp\": \"2024-01-01T00:00:00Z\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9090/api/products/create",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"products",
+						"create"
+					]
+				},
+				"description": "JSON endpoint with semantic matching that validates product data. Processor generates product ID, formats price, and determines stock availability.\n\n**Validator Logic:**\n- Price validation (positive numbers)\n- Stock validation (non-negative)\n- SKU format validation (6-10 alphanumeric characters)\n- Required field checking\n\n**Processor Logic:**\n- Auto-generated product ID (PRD-XXXXX format)\n- Price formatting ($XX.XX USD)\n- Stock availability boolean (inStock: true if stock > 0)\n- Timestamp generation\n\n**Expected Response:**\n```json\n{\n    \"success\": true,\n    \"product\": {\n        \"id\": \"PRD-45678\",\n        \"name\": \"Sample Product\",\n        \"sku\": \"PROD123\",\n        \"price\": 29.99,\n        \"category\": \"electronics\",\n        \"stock\": 100,\n        \"priceFormatted\": \"$29.99 USD\",\n        \"inStock\": true,\n        \"createdAt\": \"2024-11-23T22:30:00.123456\"\n    },\n    \"message\": \"Product Sample Product created successfully with SKU PROD123\"\n}\n```\n\n**Try these variations:**\n- Out-of-stock product (stock: \"0\")\n- Invalid SKU (too short or too long)\n- Negative price (should fail validation)\n- Negative stock (should fail validation)"
+			},
+			"response": []
+		},
+		{
+			"name": "JSON Example 5: Search with Partial Matching",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has success field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Pagination data present\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.pagination).to.exist;",
+							"    pm.expect(jsonData.pagination.page).to.be.a('number');",
+							"    pm.expect(jsonData.pagination.totalPages).to.be.a('number');",
+							"});",
+							"",
+							"pm.test(\"Results array present\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.results).to.be.an('array');",
+							"    pm.expect(jsonData.results.length).to.be.at.least(1);",
+							"});",
+							"",
+							"pm.test(\"Price range formatted\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.filters.priceRange).to.exist;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"filters\": {\n        \"category\": \"electronics\",\n        \"minPrice\": \"10.00\",\n        \"maxPrice\": \"100.00\"\n    },\n    \"pagination\": {\n        \"page\": \"1\",\n        \"limit\": \"10\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9090/api/products/search",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"products",
+						"search"
+					]
+				},
+				"description": "JSON endpoint using PARTIAL matching mode, which means only the specified fields need to match - extra fields in the request are ignored. Processor generates mock search results with pagination.\n\n**Matching Mode:** PARTIAL (allows extra fields in request)\n\n**Validator Logic:**\n- Price range validation (minPrice < maxPrice)\n- Pagination validation (positive page and limit)\n- Category validation\n\n**Processor Logic:**\n- Mock result generation based on category\n- Total results calculation (random based on category)\n- Total pages calculation (totalResults / limit)\n- Price range formatting\n- Sample product generation for results array\n\n**Expected Response:**\n```json\n{\n    \"success\": true,\n    \"filters\": {\n        \"category\": \"electronics\",\n        \"priceRange\": \"$10.00 - $100.00\"\n    },\n    \"pagination\": {\n        \"page\": 1,\n        \"limit\": 10,\n        \"totalPages\": 16,\n        \"totalResults\": 156\n    },\n    \"results\": [\n        {\n            \"id\": \"PRD-12345\",\n            \"name\": \"Sample Electronics Product 1\",\n            \"price\": 55.0,\n            \"category\": \"electronics\"\n        },\n        ...\n    ],\n    \"message\": \"Found 156 products in category electronics\"\n}\n```\n\n**Try these variations:**\n- Different categories (books, clothing)\n- With extra fields (partial matching ignores them)\n- Invalid price range (minPrice > maxPrice)\n- Different page numbers and limits"
+			},
+			"response": []
+		},
+		{
+			"name": "JSON Example 6: Checkout with Calculations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has success field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.success).to.eql(true);",
+							"});",
+							"",
+							"pm.test(\"Order ID is generated\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.order.orderId).to.exist;",
+							"    pm.expect(jsonData.order.orderId).to.match(/^ORD-\\d{8}-\\d+$/);",
+							"});",
+							"",
+							"pm.test(\"Total items calculated\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.order.totalItems).to.be.a('number');",
+							"    pm.expect(jsonData.order.totalItems).to.be.at.least(1);",
+							"});",
+							"",
+							"pm.test(\"Subtotal, tax, and total calculated\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.order.subtotal).to.exist;",
+							"    pm.expect(jsonData.order.tax).to.exist;",
+							"    pm.expect(jsonData.order.total).to.exist;",
+							"});",
+							"",
+							"pm.test(\"Payment status is approved\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payment.status).to.eql('approved');",
+							"});",
+							"",
+							"pm.test(\"Transaction ID is generated\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.payment.transactionId).to.exist;",
+							"    pm.expect(jsonData.payment.transactionId).to.match(/^TXN-[A-F0-9]+$/);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"cart\": {\n        \"items\": [\n            {\n                \"productId\": \"101\",\n                \"quantity\": \"2\",\n                \"price\": \"25.50\"\n            }\n        ]\n    },\n    \"customer\": {\n        \"customerId\": \"12345\",\n        \"email\": \"customer@example.com\"\n    },\n    \"payment\": {\n        \"method\": \"credit_card\",\n        \"currency\": \"USD\"\n    }\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9090/api/checkout",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"checkout"
+					]
+				},
+				"description": "JSON endpoint that validates cart data and calculates order totals. Processor computes subtotal, tax (16%), total, and generates order/transaction IDs.\n\n**Validator Logic:**\n- Cart validation (at least one item)\n- Item quantity/price validation (positive numbers)\n- Payment method validation (credit_card, debit_card, bank_transfer, paypal)\n- Email validation\n\n**Processor Logic:**\n- Total items calculation (sum of all quantities)\n- Subtotal calculation (sum of quantity × price for all items)\n- Tax calculation (16% of subtotal)\n- Total calculation (subtotal + tax)\n- Order ID generation (ORD-YYYYMMDD-XXXXX format)\n- Transaction ID generation (TXN-XXXXXXXXXXXX format)\n- Delivery estimation based on payment method:\n  - credit_card/debit_card: +2 days\n  - bank_transfer: +5 days\n- Timestamp generation\n\n**Expected Response:**\n```json\n{\n    \"success\": true,\n    \"order\": {\n        \"orderId\": \"ORD-20241123-4567\",\n        \"customerId\": \"12345\",\n        \"totalItems\": 2,\n        \"subtotal\": \"51.00\",\n        \"tax\": \"8.16\",\n        \"total\": \"59.16\",\n        \"currency\": \"USD\",\n        \"paymentMethod\": \"credit_card\",\n        \"estimatedDelivery\": \"2024-11-25\",\n        \"createdAt\": \"2024-11-23T22:30:00.123456\"\n    },\n    \"payment\": {\n        \"status\": \"approved\",\n        \"transactionId\": \"TXN-A1B2C3D4E5F6\"\n    },\n    \"message\": \"Order ORD-20241123-4567 created successfully. Total: USD 59.16\"\n}\n```\n\n**Try these variations:**\n- Different payment methods (bank_transfer, paypal)\n- Multiple items with different quantities\n- Single item\n- Invalid payment method (should fail validation)\n- Empty cart (should fail validation)"
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Server is healthy\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('healthy');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/_health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"_health"
+					]
+				},
+				"description": "Built-in health check endpoint that returns server status and uptime.\n\n**Features:**\n- Server health monitoring\n- Uptime tracking\n\n**Expected Response:**\n```json\n{\n    \"status\": \"healthy\",\n    \"uptime\": <seconds>\n}\n```"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:9090",
+			"type": "string"
+		}
+	]
+}

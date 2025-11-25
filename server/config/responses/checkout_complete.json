@@ -1,0 +1,20 @@
+{
+    "success": true,
+    "order": {
+        "orderId": "{{ BODY_PROCESSED.order_id }}",
+        "customerId": "{{ BODY_PROCESSED.customer_id }}",
+        "totalItems": {{ BODY_PROCESSED.total_items }},
+        "subtotal": {{ BODY_PROCESSED.subtotal }},
+        "tax": {{ BODY_PROCESSED.tax }},
+        "total": {{ BODY_PROCESSED.total }},
+        "currency": "{{ BODY_PROCESSED.currency }}",
+        "paymentMethod": "{{ BODY_PROCESSED.payment_method }}",
+        "estimatedDelivery": "{{ BODY_PROCESSED.estimated_delivery }}",
+        "createdAt": "{{ BODY_PROCESSED.timestamp }}"
+    },
+    "payment": {
+        "status": "{{ BODY_PROCESSED.payment_status }}",
+        "transactionId": "{{ BODY_PROCESSED.transaction_id }}"
+    },
+    "message": "Order {{ BODY_PROCESSED.order_id }} created successfully. Total: {{ BODY_PROCESSED.currency }} {{ BODY_PROCESSED.total }}"
+}

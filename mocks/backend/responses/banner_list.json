@@ -1,0 +1,25 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "title": "Ofertas de Temporada",
+            "subtitle": "Descuentos hasta 30%",
+            "image": "https://via.placeholder.com/1200x400",
+            "link": "/ofertas",
+            "is_active": true,
+            "order": 1
+        },
+        {
+            "id": 2,
+            "title": "Productos Frescos",
+            "subtitle": "Directo del campo a tu mesa",
+            "image": "https://via.placeholder.com/1200x400",
+            "link": "/frescos",
+            "is_active": true,
+            "order": 2
+        }
+    ]
+}

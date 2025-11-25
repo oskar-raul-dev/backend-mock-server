@@ -1,0 +1,389 @@
+{
+	"info": {
+		"_postman_id": "mockserver-basic-examples",
+		"name": "MockServer - Basic Examples",
+		"description": "Collection of basic mockserver examples demonstrating core features:\n\n- Query parameter matching and template variables\n- JSON body handling\n- Path parameter extraction with regex\n- File-based responses\n- Round-robin response cycling\n- Header validation\n- Error responses (404, 500)\n\n**Starting the Server:**\n```bash\npython main.py --config-dir config --endpoints-file endpoints.py\n```\n\n**Server URL:** http://localhost:9090\n\n**Health Check:** http://localhost:9090/_health",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Example 1: GET /hello with Query Parameter",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has message field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/hello?name=Juan",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"hello"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "Juan",
+							"description": "Name parameter for personalized greeting"
+						}
+					]
+				},
+				"description": "Simple GET endpoint that accepts a query parameter 'name' and returns a personalized greeting using template variables.\n\n**Features:**\n- Query parameter matching\n- Template variable usage (QUERY_PARAMS)\n\n**Expected Response:**\n```json\n{\"message\": \"hello world Juan\"}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Example 2: POST /hello with JSON Body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response echoes request body\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('received_body');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Juan\",\n    \"lastname\": \"Pérez\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:9090/hello",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"hello"
+					]
+				},
+				"description": "POST endpoint that receives JSON data and echoes it back in the response using the BODY template variable.\n\n**Features:**\n- JSON body handling\n- Template variable usage (BODY)\n- Header validation (Content-Type)\n\n**Expected Response:**\n```json\n{\"received_body\": {\"name\": \"Juan\", \"lastname\": \"Pérez\"}}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Example 3: GET /hello/{name}/{lastname}",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains greeting\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('msg');",
+							"    pm.expect(jsonData.msg).to.include('pedro perez');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/hello/pedro/perez",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"hello",
+						"pedro",
+						"perez"
+					]
+				},
+				"description": "GET endpoint with regex path parameters. Captures two path segments and uses them in the response via PATH_PARAMS.\n\n**Features:**\n- Regex URL matching\n- Path parameter extraction\n- Template variable usage (PATH_PARAMS)\n\n**Expected Response:**\n```json\n{\"msg\": \"Hola pedro perez\"}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Example 4: GET /lorem - File Response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Content-Type is text/plain\", function () {",
+							"    pm.response.to.have.header('Content-Type', 'text/plain');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/lorem",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"lorem"
+					]
+				},
+				"description": "GET endpoint that returns the content of a file (lorem_ipsum.txt) from the responses directory.\n\n**Features:**\n- File-based responses (body_file)\n- Text/plain content type\n\n**Expected Response:**\nContent of lorem_ipsum.txt file (Lorem Ipsum text)"
+			},
+			"response": []
+		},
+		{
+			"name": "Example 5: GET /counter - Round-Robin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has count field\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('count');",
+							"    pm.expect(jsonData.count).to.be.oneOf([1, 2, 3]);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/counter",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"counter"
+					]
+				},
+				"description": "GET endpoint with multiple responses that cycle in order. Each request returns the next response in sequence.\n\n**Features:**\n- Multiple responses (round-robin cycling)\n- Response state management\n\n**Expected Responses (in order):**\n1. `{\"count\": 1}`\n2. `{\"count\": 2}`\n3. `{\"count\": 3}`\n4. `{\"count\": 1}` (cycles back)\n\n**Tip:** Send this request multiple times to see the cycling behavior."
+			},
+			"response": []
+		},
+		{
+			"name": "Example 6: GET /api/protected - Header Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response contains auth info\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"    pm.expect(jsonData).to.have.property('auth');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer my-secret-token-12345",
+						"type": "text",
+						"description": "Bearer token for authorization"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:9090/api/protected",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"api",
+						"protected"
+					]
+				},
+				"description": "GET endpoint that requires an Authorization header with Bearer token. Returns the token value in the response.\n\n**Features:**\n- Header validation (regex matching)\n- Template variable usage (HEADERS)\n\n**Required Header:**\n`Authorization: Bearer <token>`\n\n**Expected Response:**\n```json\n{\n    \"message\": \"Access granted\",\n    \"auth\": \"Bearer my-secret-token-12345\"\n}\n```\n\n**Tip:** Remove the Authorization header to see a 404 response."
+			},
+			"response": []
+		},
+		{
+			"name": "Example 7: GET /not-found - 404 Error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Response contains error message\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/not-found",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"not-found"
+					]
+				},
+				"description": "GET endpoint that simulates a 404 Not Found error response.\n\n**Features:**\n- Custom status code (404)\n- Error response format\n\n**Expected Response (404):**\n```json\n{\"error\": \"Resource not found\"}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Example 8: GET /error - 500 Error",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 500\", function () {",
+							"    pm.response.to.have.status(500);",
+							"});",
+							"",
+							"pm.test(\"Response contains error details\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('error');",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/error",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"error"
+					]
+				},
+				"description": "GET endpoint that simulates a 500 Internal Server Error response.\n\n**Features:**\n- Custom status code (500)\n- Error response format with details\n\n**Expected Response (500):**\n```json\n{\n    \"error\": \"Internal server error\",\n    \"message\": \"Something went wrong\"\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Server is healthy\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.eql('healthy');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:9090/_health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "9090",
+					"path": [
+						"_health"
+					]
+				},
+				"description": "Built-in health check endpoint that returns server status and uptime.\n\n**Features:**\n- Server health monitoring\n- Uptime tracking\n\n**Expected Response:**\n```json\n{\n    \"status\": \"healthy\",\n    \"uptime\": <seconds>\n}\n```"
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:9090",
+			"type": "string"
+		}
+	]
+}

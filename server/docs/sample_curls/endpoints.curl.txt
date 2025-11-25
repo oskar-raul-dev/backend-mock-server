@@ -1,0 +1,173 @@
+===============================================================================
+MockServer - Basic Examples - cURL Test Commands
+===============================================================================
+
+STARTING THE SERVER:
+-------------------
+From the mockserver/ directory, run:
+
+  python main.py --config-dir config --endpoints-file endpoints.py
+
+Or with custom port:
+
+  python main.py --config-dir config --endpoints-file endpoints.py --port 9090
+
+The server will start at http://localhost:9090 (or your custom port)
+
+===============================================================================
+
+EXAMPLE 1: GET /hello with Query Parameter
+-------------------------------------------
+Description: Simple GET endpoint that accepts a query parameter 'name' and
+             returns a personalized greeting using template variables.
+
+Command:
+curl -X GET "http://localhost:9090/hello?name=Juan"
+
+Expected Response:
+{"message": "hello world Juan"}
+
+Try with different names:
+curl -X GET "http://localhost:9090/hello?name=Maria"
+curl -X GET "http://localhost:9090/hello?name=Pedro"
+
+===============================================================================
+
+EXAMPLE 2: POST /hello with JSON Body
+--------------------------------------
+Description: POST endpoint that receives JSON data and echoes it back in the
+             response using the BODY template variable.
+
+Command:
+curl -X POST http://localhost:9090/hello \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Juan", "lastname": "Pérez"}'
+
+Expected Response:
+{"received_body": {"name": "Juan", "lastname": "Pérez"}}
+
+Try with different data:
+curl -X POST http://localhost:9090/hello \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Maria", "lastname": "García"}'
+
+===============================================================================
+
+EXAMPLE 3: GET /hello/{name}/{lastname} - Path Parameters
+----------------------------------------------------------
+Description: GET endpoint with regex path parameters. Captures two path
+             segments and uses them in the response via PATH_PARAMS.
+
+Command:
+curl -X GET "http://localhost:9090/hello/pedro/perez"
+
+Expected Response:
+{"msg": "Hola pedro perez"}
+
+Try with different names:
+curl -X GET "http://localhost:9090/hello/maria/garcia"
+curl -X GET "http://localhost:9090/hello/juan/lopez"
+
+===============================================================================
+
+EXAMPLE 4: GET /lorem - Response from File
+-------------------------------------------
+Description: GET endpoint that returns the content of a file (lorem_ipsum.txt)
+             from the responses directory.
+
+Command:
+curl -X GET http://localhost:9090/lorem
+
+Expected Response:
+(Content of lorem_ipsum.txt file - Lorem Ipsum text)
+
+===============================================================================
+
+EXAMPLE 5: GET /counter - Multiple Responses (Round-Robin)
+-----------------------------------------------------------
+Description: GET endpoint with multiple responses that cycle in order.
+             Each request returns the next response in sequence.
+
+Command (run multiple times):
+curl -X GET http://localhost:9090/counter
+
+Expected Responses (in order):
+1st call: {"count": 1}
+2nd call: {"count": 2}
+3rd call: {"count": 3}
+4th call: {"count": 1}  (cycles back to first)
+5th call: {"count": 2}
+... and so on
+
+Test the cycling:
+curl -X GET http://localhost:9090/counter
+curl -X GET http://localhost:9090/counter
+curl -X GET http://localhost:9090/counter
+curl -X GET http://localhost:9090/counter
+
+===============================================================================
+
+EXAMPLE 6: GET /api/protected - Header Validation
+--------------------------------------------------
+Description: GET endpoint that requires an Authorization header with Bearer
+             token. Returns the token value in the response.
+
+Command:
+curl -X GET http://localhost:9090/api/protected \
+  -H "Authorization: Bearer my-secret-token-12345"
+
+Expected Response:
+{"message": "Access granted", "auth": "Bearer my-secret-token-12345"}
+
+Try with different tokens:
+curl -X GET http://localhost:9090/api/protected \
+  -H "Authorization: Bearer abc123xyz"
+
+Without the header (should fail):
+curl -X GET http://localhost:9090/api/protected
+
+===============================================================================
+
+EXAMPLE 7: GET /not-found - Simulate 404 Error
+-----------------------------------------------
+Description: GET endpoint that simulates a 404 Not Found error response.
+
+Command:
+curl -X GET http://localhost:9090/not-found
+
+Expected Response (404):
+{"error": "Resource not found"}
+
+===============================================================================
+
+EXAMPLE 8: GET /error - Simulate 500 Error
+-------------------------------------------
+Description: GET endpoint that simulates a 500 Internal Server Error response.
+
+Command:
+curl -X GET http://localhost:9090/error
+
+Expected Response (500):
+{"error": "Internal server error", "message": "Something went wrong"}
+
+===============================================================================
+
+ADDITIONAL TIPS:
+----------------
+
+Pretty-print JSON responses with jq:
+  curl -s http://localhost:9090/hello?name=Juan | jq .
+
+View response headers:
+  curl -i http://localhost:9090/hello?name=Juan
+
+View verbose output (request/response details):
+  curl -v http://localhost:9090/hello?name=Juan
+
+Test with verbose output and pretty JSON:
+  curl -v http://localhost:9090/hello?name=Juan | jq .
+
+Check server health:
+  curl http://localhost:9090/_health
+
+===============================================================================

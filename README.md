@@ -1,93 +1,311 @@
-# Backend Mock Server
+# MockServer
 
+A flexible HTTP mock server with semantic body matching, custom validators, and dynamic response generation.
 
+## Features
 
-## Getting started
+- **Semantic Matching**: Format-aware XML and JSON comparison (not just string matching)
+- **Custom Validators**: Add business rule validation to requests
+- **Custom Processors**: Extract and transform data from requests
+- **Template Variables**: Dynamic response generation with Jinja2
+- **Round-Robin Responses**: Cycle through multiple responses
+- **Auto-Reload**: Automatically reload configuration on file changes
+- **CORS Support**: Built-in CORS handling for frontend development
+- **Multiple Matching Modes**: Semantic, partial, and strict matching
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## Repository Structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/beliberi-app/backend-mock-server.git
-git branch -M main
-git push -uf origin main
+backend-mock-server/
+├── server/                 # Mock server source code
+│   ├── main.py            # Entry point
+│   ├── config/            # Example configurations
+│   ├── docs/              # Full documentation
+│   └── tests/             # Test suite
+├── mocks/                  # Mock definitions by microservice
+│   └── backend/           # Beliberi backend API mocks
+├── venv/                   # Virtual environment (created on setup)
+├── requirements.txt        # Python dependencies
+├── start.sh               # Linux/macOS startup script
+├── start.bat              # Windows CMD startup script
+└── start.ps1              # Windows PowerShell startup script
 ```
 
-## Integrate with your tools
+## Quick Setup
 
-- [ ] [Set up project integrations](https://gitlab.com/beliberi-app/backend-mock-server/-/settings/integrations)
+### Prerequisites
 
-## Collaborate with your team
+- Python 3.11 or higher
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### Linux/macOS
 
-## Test and Deploy
+```bash
+# 1. Clone the repository and navigate to it
+cd backend-mock-server
 
-Use the built-in continuous integration in GitLab.
+# 2. Create virtual environment
+python3 -m venv venv
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+# 3. Activate virtual environment
+source venv/bin/activate
 
-***
+# 4. Install dependencies
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
 
-# Editing this README
+# 5. Start the server with backend mocks
+./start.sh backend
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+# Server will start at http://localhost:9090
+```
 
-## Suggestions for a good README
+### Windows (CMD)
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```cmd
+REM 1. Navigate to repository
+cd backend-mock-server
 
-## Name
-Choose a self-explaining name for your project.
+REM 2. Create virtual environment
+python -m venv venv
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+REM 3. Activate virtual environment
+venv\Scripts\activate
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+REM 4. Install dependencies
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+REM 5. Start the server with backend mocks
+start.bat backend
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+REM Server will start at http://localhost:9090
+```
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+### Windows (PowerShell)
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+```powershell
+# 1. Navigate to repository
+cd backend-mock-server
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+# 2. Create virtual environment
+python -m venv venv
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+# 3. Activate virtual environment
+.\venv\Scripts\Activate.ps1
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+# 4. Install dependencies
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+# 5. Start the server with backend mocks
+.\start.ps1 backend
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+# Server will start at http://localhost:9090
+```
+
+## Quick Example
+
+Once the server is running, test it with:
+
+```bash
+# Simple GET request with query parameter
+curl "http://localhost:9090/hello?name=World"
+
+# Expected response:
+# {"message": "hello world World"}
+```
+
+## Server Startup Options
+
+Using the startup scripts:
+
+```bash
+# Linux/macOS
+./start.sh backend              # Start with default port (9090)
+./start.sh backend 8080         # Start with custom port
+
+# Windows CMD
+start.bat backend
+start.bat backend 8080
+
+# Windows PowerShell
+.\start.ps1 backend
+.\start.ps1 backend -Port 8080
+```
+
+Or run directly from the server directory:
+
+```bash
+cd server
+
+# Start with custom port
+python main.py --config-dir ../mocks/backend --port 8080
+
+# Start with debug logging
+python main.py --config-dir ../mocks/backend --log-level DEBUG
+
+# View all options
+python main.py --help
+```
+
+## Creating Your Own Mocks
+
+### Using the mocks/ Directory
+
+Create a new directory under `mocks/` for each microservice:
+
+```bash
+# Create new mock configuration
+mkdir -p mocks/my-service/requests mocks/my-service/responses
+
+# Copy example configuration as template
+cp server/config/config.py mocks/my-service/
+cp server/config/endpoints.py mocks/my-service/
+```
+
+### Mock Directory Structure
+
+Each mock directory should contain:
+
+```
+mocks/my-service/
+├── config.py           # Server configuration (port, CORS, etc.)
+├── endpoints.py        # Mock endpoint definitions
+├── requests/           # Request body templates for matching
+│   └── *.json|xml
+└── responses/          # Response body templates
+    └── *.json|xml
+```
+
+### Basic Mock Definition
+
+```python
+# mocks/my-service/endpoints.py
+definitions = [
+    {
+        "request": {
+            "url": r"^/api/hello$",
+            "methods": ["GET"],
+            "query_params": {
+                "name": r".+"  # Matches any non-empty value
+            }
+        },
+        "response": {
+            "status": 200,
+            "headers": {"Content-Type": "application/json"},
+            "body": '{"greeting": "Hello {{ QUERY_PARAMS.name }}!"}'
+        }
+    }
+]
+```
+
+## Example Configurations
+
+The `server/config/` directory contains example configurations:
+
+- **`endpoints.py`**: Basic examples demonstrating core features
+  - Query parameters, path parameters, headers
+  - JSON and XML responses
+  - File-based responses
+  - Round-robin responses
+  - Error simulation (404, 500)
+
+- **`endpoints_advanced_examples.py`**: Advanced examples with validators and processors
+  - XML semantic matching with validation
+  - JSON semantic matching with partial mode
+  - Custom validators for business rules
+  - Custom processors for data transformation
+  - Complex response generation
+
+Test the examples using the included curl commands or Postman collections in `server/docs/sample_curls/` and `server/docs/sample_postman/`.
+
+## Documentation
+
+Complete documentation is available in the `server/docs/` directory:
+
+- **[Documentation Index](server/docs/00_Index.md)** - Start here for full documentation
+- **[Quickstart Guide](server/docs/01_Quickstart_Guide.md)** - Step-by-step tutorial with complete examples
+- **[Server Startup Options](server/docs/02_Server_Startup_Options.md)** - CLI options and configuration
+- **[Request Configuration](server/docs/03_Request_Configuration.md)** - Request matching, validators, processors
+- **[Response Templates](server/docs/04_Response_Templates.md)** - Response generation and templating
+- **[Body Matching](server/docs/05_Body_Matching.md)** - Semantic XML/JSON matching
+- **[Validators and Processors](server/docs/06_Validators_And_Processors.md)** - Custom validation and data processing
+- **[Advanced Examples](server/docs/07_Advanced_Examples.md)** - Real-world examples with validators/processors
+- **[Internals & Architecture](server/docs/08_Internals_Architecture.md)** - System architecture and design
+- **[Troubleshooting](server/docs/09_Troubleshooting.md)** - Common issues and solutions
+
+### Quick Links
+
+- **Testing Examples**: [cURL Commands](server/docs/sample_curls/) | [Postman Collections](server/docs/sample_postman/)
+- **Configuration Reference**: [server/config/README.md](server/config/README.md)
+
+## Health Check
+
+The server provides a built-in health check endpoint:
+
+```bash
+curl http://localhost:9090/_health
+
+# Response:
+# {
+#   "status": "healthy",
+#   "uptime": 42.5,
+#   "definitions_loaded": 8,
+#   "config_dir": "/path/to/config"
+# }
+```
+
+## Running Tests
+
+```bash
+# Activate virtual environment first
+source venv/bin/activate  # Linux/macOS
+# or: venv\Scripts\activate  # Windows
+
+# Run all tests
+cd server
+pytest
+
+# Run specific test file
+pytest tests/core/test_matcher.py
+
+# Run with verbose output
+pytest -v
+
+# Run by marker
+pytest -m unit
+pytest -m integration
+```
+
+## Use Cases
+
+- **API Development**: Mock external APIs during development
+- **Frontend Development**: Work without backend dependencies
+- **Testing**: Create deterministic test scenarios
+- **Demo/Proof of Concept**: Quickly prototype API behavior
+- **Training**: Simulate complex API interactions
+- **Integration Testing**: Test error scenarios and edge cases
+
+## What Makes It Different
+
+Unlike simple HTTP mocking tools, MockServer provides:
+
+1. **Semantic Matching**: Understands XML and JSON structure, not just strings
+2. **Business Logic**: Add validators to enforce rules (age ranges, email formats, etc.)
+3. **Data Transformation**: Use processors to extract and transform request data
+4. **Dynamic Responses**: Generate responses with data from the request
+5. **Stateful Mocking**: Round-robin responses for simulating state changes
 
 ## License
-For open source projects, say how it is licensed.
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+MIT License - See LICENSE file for details
+
+## Contributing
+
+Contributions are welcome! Please see the documentation for architecture details and extension points.
+
+## Support
+
+- **Documentation**: See `server/docs/` directory
+- **Examples**: See `server/config/` directory
+- **Issues**: Report bugs or request features via GitLab issues

@@ -1,0 +1,19 @@
+{
+    "cart": {
+        "items": [
+            {
+                "productId": "101",
+                "quantity": "2",
+                "price": "25.50"
+            }
+        ]
+    },
+    "customer": {
+        "customerId": "12345",
+        "email": "customer@example.com"
+    },
+    "payment": {
+        "method": "credit_card",
+        "currency": "USD"
+    }
+}

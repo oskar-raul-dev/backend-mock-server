@@ -1,0 +1,602 @@
+===============================================================================
+MockServer - Advanced Examples - cURL Test Commands
+===============================================================================
+
+STARTING THE SERVER:
+-------------------
+From the mockserver/ directory, run:
+
+  python main.py --config-dir config --endpoints-file endpoints_advanced_examples.py
+
+Or with custom port:
+
+  python main.py --config-dir config --endpoints-file endpoints_advanced_examples.py --port 9090
+
+The server will start at http://localhost:9090 (or your custom port)
+
+===============================================================================
+XML EXAMPLES
+===============================================================================
+
+EXAMPLE 1: POST /api/users/create - Create User with Validation
+----------------------------------------------------------------
+Description: XML endpoint with semantic matching that validates email format
+             and age range (18-120). Processor generates user ID from email
+             hash and categorizes users by age group.
+
+Features:
+  - Email validation (must contain @ and .)
+  - Age validation (18-120 years)
+  - Auto-generated user ID (MD5 hash of email)
+  - Age-based grouping (young_adult, adult, middle_aged, senior)
+  - Full name composition
+
+Command:
+curl -X POST http://localhost:9090/api/users/create \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<createUserRequest>
+    <user>
+        <firstName>John</firstName>
+        <lastName>Doe</lastName>
+        <email>john.doe@example.com</email>
+        <age>30</age>
+    </user>
+    <metadata>
+        <source>web</source>
+    </metadata>
+</createUserRequest>'
+
+Expected Response (201):
+<?xml version="1.0" encoding="UTF-8"?>
+<createUserResponse>
+    <success>true</success>
+    <user>
+        <id>6579DA5F</id>
+        <firstName>John</firstName>
+        <lastName>Doe</lastName>
+        <email>john.doe@example.com</email>
+        <fullName>John Doe</fullName>
+        <ageGroup>adult</ageGroup>
+        <createdAt>2024-11-23T22:30:00.123456</createdAt>
+    </user>
+    <metadata>
+        <source>web</source>
+        <processedBy>mockserver</processedBy>
+    </metadata>
+</createUserResponse>
+
+Test with different ages:
+# Young adult (< 25)
+curl -X POST http://localhost:9090/api/users/create \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<createUserRequest>
+    <user>
+        <firstName>John</firstName>
+        <lastName>Doe</lastName>
+        <email>john.doe@example.com</email>
+        <age>22</age>
+    </user>
+    <metadata>
+        <source>web</source>
+    </metadata>
+</createUserRequest>'
+
+# Middle aged (40-59)
+curl -X POST http://localhost:9090/api/users/create \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<createUserRequest>
+    <user>
+        <firstName>John</firstName>
+        <lastName>Doe</lastName>
+        <email>john.doe@example.com</email>
+        <age>45</age>
+    </user>
+    <metadata>
+        <source>web</source>
+    </metadata>
+</createUserRequest>'
+
+# Senior (>= 60)
+curl -X POST http://localhost:9090/api/users/create \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<createUserRequest>
+    <user>
+        <firstName>John</firstName>
+        <lastName>Doe</lastName>
+        <email>john.doe@example.com</email>
+        <age>65</age>
+    </user>
+    <metadata>
+        <source>web</source>
+    </metadata>
+</createUserRequest>'
+
+Test validation failure (age too young):
+curl -X POST http://localhost:9090/api/users/create \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<createUserRequest>
+    <user>
+        <firstName>John</firstName>
+        <lastName>Doe</lastName>
+        <email>john.doe@example.com</email>
+        <age>15</age>
+    </user>
+    <metadata>
+        <source>web</source>
+    </metadata>
+</createUserRequest>'
+
+===============================================================================
+
+EXAMPLE 2: POST /api/orders/update - Update Order with Calculations
+--------------------------------------------------------------------
+Description: XML endpoint that validates order status and calculates totals.
+             Processor computes item count, total amount, and estimates
+             delivery date based on order status.
+
+Features:
+  - Status validation (pending, processing, completed, cancelled)
+  - Item count calculation
+  - Total amount calculation (quantity × price for all items)
+  - Delivery date estimation based on status:
+    - pending: +7 days
+    - processing: +3 days
+    - completed: today
+    - cancelled: N/A
+
+Command:
+curl -X POST http://localhost:9090/api/orders/update \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<updateOrderRequest>
+    <order>
+        <orderId>12345</orderId>
+        <status>pending</status>
+        <items>
+            <item>
+                <productId>101</productId>
+                <quantity>1</quantity>
+                <price>10.00</price>
+            </item>
+        </items>
+    </order>
+</updateOrderRequest>'
+
+Expected Response:
+<?xml version="1.0" encoding="UTF-8"?>
+<updateOrderResponse>
+    <success>true</success>
+    <order>
+        <orderId>12345</orderId>
+        <status>pending</status>
+        <totalItems>1</totalItems>
+        <totalAmount>10.00</totalAmount>
+        <estimatedDelivery>2024-11-30</estimatedDelivery>
+    </order>
+    <message>Order 12345 updated to pending</message>
+</updateOrderResponse>
+
+Test with different statuses:
+# Processing order (faster delivery)
+curl -X POST http://localhost:9090/api/orders/update \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<updateOrderRequest>
+    <order>
+        <orderId>12345</orderId>
+        <status>processing</status>
+        <items>
+            <item>
+                <productId>101</productId>
+                <quantity>1</quantity>
+                <price>10.00</price>
+            </item>
+        </items>
+    </order>
+</updateOrderRequest>'
+
+# Completed order
+curl -X POST http://localhost:9090/api/orders/update \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<updateOrderRequest>
+    <order>
+        <orderId>12345</orderId>
+        <status>completed</status>
+        <items>
+            <item>
+                <productId>101</productId>
+                <quantity>1</quantity>
+                <price>10.00</price>
+            </item>
+        </items>
+    </order>
+</updateOrderRequest>'
+
+===============================================================================
+
+EXAMPLE 3: POST /api/payments/notify - Payment with Currency Conversion
+------------------------------------------------------------------------
+Description: XML endpoint that validates payment data and performs currency
+             conversion. Processor converts amounts to VES and calculates
+             processing fees.
+
+Features:
+  - Currency validation (USD, EUR, VES)
+  - Amount validation (positive numbers)
+  - Currency conversion to VES (using mock exchange rates)
+  - Processing fee calculation (2.5% of amount)
+  - Status-based response messages
+
+Command:
+curl -X POST http://localhost:9090/api/payments/notify \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<paymentNotification>
+    <transaction>
+        <transactionId>ABC1234567890</transactionId>
+        <amount>100.00</amount>
+        <currency>USD</currency>
+        <status>approved</status>
+        <customer>
+            <customerId>12345</customerId>
+            <email>customer@example.com</email>
+        </customer>
+    </transaction>
+</paymentNotification>'
+
+Expected Response:
+<?xml version="1.0" encoding="UTF-8"?>
+<paymentResponse>
+    <success>true</success>
+    <transaction>
+        <transactionId>ABC1234567890</transactionId>
+        <status>approved</status>
+        <amount>100.00</amount>
+        <currency>USD</currency>
+        <amountInVES>3650.00</amountInVES>
+        <conversionRate>36.50</conversionRate>
+        <processingFee>2.50</processingFee>
+        <customerId>12345</customerId>
+        <processedAt>2024-11-23T22:30:00.123456</processedAt>
+    </transaction>
+    <message>Payment of USD 100.00 approved successfully</message>
+</paymentResponse>
+
+Test with EUR:
+curl -X POST http://localhost:9090/api/payments/notify \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0" encoding="UTF-8"?>
+<paymentNotification>
+    <transaction>
+        <transactionId>ABC1234567890</transactionId>
+        <amount>50.00</amount>
+        <currency>EUR</currency>
+        <status>approved</status>
+        <customer>
+            <customerId>12345</customerId>
+            <email>customer@example.com</email>
+        </customer>
+    </transaction>
+</paymentNotification>'
+
+===============================================================================
+JSON EXAMPLES
+===============================================================================
+
+EXAMPLE 4: POST /api/products/create - Create Product with Validation
+----------------------------------------------------------------------
+Description: JSON endpoint with semantic matching that validates product data.
+             Processor generates product ID, formats price, and determines
+             stock availability.
+
+Features:
+  - Price validation (positive numbers)
+  - Stock validation (non-negative)
+  - SKU format validation (6-10 alphanumeric characters)
+  - Auto-generated product ID
+  - Price formatting ($XX.XX USD)
+  - Stock availability boolean
+
+Command:
+curl -X POST http://localhost:9090/api/products/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product": {
+        "name": "Sample Product",
+        "sku": "PROD123",
+        "price": "29.99",
+        "category": "electronics",
+        "stock": "100"
+    },
+    "metadata": {
+        "source": "api",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
+}'
+
+Expected Response (201):
+{
+    "success": true,
+    "product": {
+        "id": "PRD-45678",
+        "name": "Sample Product",
+        "sku": "PROD123",
+        "price": 29.99,
+        "category": "electronics",
+        "stock": 100,
+        "priceFormatted": "$29.99 USD",
+        "inStock": true,
+        "createdAt": "2024-11-23T22:30:00.123456"
+    },
+    "message": "Product Sample Product created successfully with SKU PROD123"
+}
+
+Test with out-of-stock product:
+curl -X POST http://localhost:9090/api/products/create \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product": {
+        "name": "Sample Product",
+        "sku": "PROD123",
+        "price": "29.99",
+        "category": "electronics",
+        "stock": "0"
+    },
+    "metadata": {
+        "source": "api",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
+}'
+
+===============================================================================
+
+EXAMPLE 5: POST /api/products/search - Search with Partial Matching
+--------------------------------------------------------------------
+Description: JSON endpoint using PARTIAL matching mode, which means only the
+             specified fields need to match - extra fields in the request are
+             ignored. Processor generates mock search results with pagination.
+
+Features:
+  - Partial matching (allows extra fields in request)
+  - Price range validation (min < max)
+  - Pagination validation
+  - Mock result generation based on category
+  - Total pages calculation
+
+Command:
+curl -X POST http://localhost:9090/api/products/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filters": {
+        "category": "electronics",
+        "minPrice": "10.00",
+        "maxPrice": "100.00"
+    },
+    "pagination": {
+        "page": "1",
+        "limit": "10"
+    }
+}'
+
+Expected Response:
+{
+    "success": true,
+    "filters": {
+        "category": "electronics",
+        "priceRange": "$10.00 - $100.00"
+    },
+    "pagination": {
+        "page": 1,
+        "limit": 10,
+        "totalPages": 16,
+        "totalResults": 156
+    },
+    "results": [
+        {
+            "id": "PRD-12345",
+            "name": "Sample Electronics Product 1",
+            "price": 55.0,
+            "category": "electronics"
+        },
+        {
+            "id": "PRD-12346",
+            "name": "Sample Electronics Product 2",
+            "price": 37.0,
+            "category": "electronics"
+        },
+        {
+            "id": "PRD-12347",
+            "name": "Sample Electronics Product 3",
+            "price": 73.0,
+            "category": "electronics"
+        }
+    ],
+    "message": "Found 156 products in category electronics"
+}
+
+Test with different categories:
+# Books
+curl -X POST http://localhost:9090/api/products/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filters": {
+        "category": "books",
+        "minPrice": "5.00",
+        "maxPrice": "50.00"
+    },
+    "pagination": {
+        "page": "1",
+        "limit": "20"
+    }
+}'
+
+# With extra fields (partial matching ignores them)
+curl -X POST http://localhost:9090/api/products/search \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filters": {
+        "category": "clothing",
+        "minPrice": "20.00",
+        "maxPrice": "200.00",
+        "extraField": "this will be ignored"
+    },
+    "pagination": {
+        "page": "2",
+        "limit": "15"
+    },
+    "anotherExtraField": "also ignored"
+}'
+
+===============================================================================
+
+EXAMPLE 6: POST /api/checkout - Checkout with Order Calculations
+-----------------------------------------------------------------
+Description: JSON endpoint that validates cart data and calculates order totals.
+             Processor computes subtotal, tax (16%), total, and generates
+             order/transaction IDs.
+
+Features:
+  - Cart validation (at least one item)
+  - Item quantity/price validation (positive numbers)
+  - Payment method validation (credit_card, debit_card, bank_transfer, paypal)
+  - Email validation
+  - Subtotal calculation (sum of quantity × price)
+  - Tax calculation (16% of subtotal)
+  - Order ID and transaction ID generation
+  - Delivery estimation based on payment method
+
+Command:
+curl -X POST http://localhost:9090/api/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cart": {
+        "items": [
+            {
+                "productId": "101",
+                "quantity": "2",
+                "price": "25.50"
+            },
+            {
+                "productId": "102",
+                "quantity": "1",
+                "price": "15.00"
+            }
+        ]
+    },
+    "customer": {
+        "customerId": "7890",
+        "email": "customer@example.com"
+    },
+    "payment": {
+        "method": "credit_card",
+        "currency": "USD"
+    }
+}'
+
+Expected Response:
+{
+    "success": true,
+    "order": {
+        "orderId": "ORD-20241123-4567",
+        "customerId": "7890",
+        "totalItems": 3,
+        "subtotal": "66.00",
+        "tax": "10.56",
+        "total": "76.56",
+        "currency": "USD",
+        "paymentMethod": "credit_card",
+        "estimatedDelivery": "2024-11-25",
+        "createdAt": "2024-11-23T22:30:00.123456"
+    },
+    "payment": {
+        "status": "approved",
+        "transactionId": "TXN-A1B2C3D4E5F6"
+    },
+    "message": "Order ORD-20241123-4567 created successfully. Total: USD 76.56"
+}
+
+Test with bank transfer (slower delivery):
+curl -X POST http://localhost:9090/api/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cart": {
+        "items": [
+            {
+                "productId": "201",
+                "quantity": "5",
+                "price": "12.00"
+            }
+        ]
+    },
+    "customer": {
+        "customerId": "5555",
+        "email": "test@example.com"
+    },
+    "payment": {
+        "method": "bank_transfer",
+        "currency": "EUR"
+    }
+}'
+
+Test with multiple items:
+curl -X POST http://localhost:9090/api/checkout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cart": {
+        "items": [
+            {
+                "productId": "301",
+                "quantity": "3",
+                "price": "19.99"
+            },
+            {
+                "productId": "302",
+                "quantity": "2",
+                "price": "34.50"
+            },
+            {
+                "productId": "303",
+                "quantity": "1",
+                "price": "129.00"
+            }
+        ]
+    },
+    "customer": {
+        "customerId": "9999",
+        "email": "buyer@example.com"
+    },
+    "payment": {
+        "method": "debit_card",
+        "currency": "USD"
+    }
+}'
+
+===============================================================================
+
+ADDITIONAL TIPS:
+----------------
+
+Pretty-print JSON responses with jq:
+  curl -s http://localhost:9090/api/products/create -H "Content-Type: application/json" \
+    -d '{"product":{"name":"Test","sku":"TEST123","price":"10.00","category":"test","stock":"50"},"metadata":{"source":"api"}}' \
+    | jq .
+
+View response headers:
+  curl -i http://localhost:9090/api/users/create -H "Content-Type: application/xml" -d '...'
+
+View verbose output (see validation failures):
+  curl -v http://localhost:9090/api/products/create -H "Content-Type: application/json" -d '...'
+
+Check server health:
+  curl http://localhost:9090/_health
+
+View server logs with DEBUG level:
+  python main.py --config-dir config --endpoints-file endpoints_advanced_examples.py --log-level DEBUG
+
+===============================================================================

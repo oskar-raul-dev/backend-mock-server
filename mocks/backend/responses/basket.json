@@ -1,0 +1,13 @@
+{
+    "id": 1,
+    "status": "Open",
+    "lines": [],
+    "total_excl_tax": "0.00",
+    "total_excl_tax_excl_discounts": "0.00",
+    "total_incl_tax": "0.00",
+    "total_incl_tax_excl_discounts": "0.00",
+    "currency": "USD",
+    "voucher_discounts": [],
+    "offer_discounts": [],
+    "is_tax_known": true
+}

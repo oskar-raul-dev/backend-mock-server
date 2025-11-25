@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<paymentResponse>
+    <success>true</success>
+    <transaction>
+        <transactionId>{{ BODY_PROCESSED.transaction_id }}</transactionId>
+        <status>{{ BODY_PROCESSED.status }}</status>
+        <amount>{{ BODY_PROCESSED.amount }}</amount>
+        <currency>{{ BODY_PROCESSED.currency }}</currency>
+        <amountInVES>{{ BODY_PROCESSED.amount_in_ves }}</amountInVES>
+        <conversionRate>{{ BODY_PROCESSED.conversion_rate }}</conversionRate>
+        <processingFee>{{ BODY_PROCESSED.processing_fee }}</processingFee>
+        <customerId>{{ BODY_PROCESSED.customer_id }}</customerId>
+        <processedAt>{{ BODY_PROCESSED.timestamp }}</processedAt>
+    </transaction>
+    <message>{{ BODY_PROCESSED.message }}</message>
+</paymentResponse>

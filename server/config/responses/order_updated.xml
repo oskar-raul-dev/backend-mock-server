@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateOrderResponse>
+    <success>true</success>
+    <order>
+        <orderId>{{ BODY_PROCESSED.order_id }}</orderId>
+        <status>{{ BODY_PROCESSED.status }}</status>
+        <totalItems>{{ BODY_PROCESSED.total_items }}</totalItems>
+        <totalAmount>{{ BODY_PROCESSED.total_amount }}</totalAmount>
+        <estimatedDelivery>{{ BODY_PROCESSED.estimated_delivery }}</estimatedDelivery>
+    </order>
+    <message>Order {{ BODY_PROCESSED.order_id }} updated to {{ BODY_PROCESSED.status }}</message>
+</updateOrderResponse>

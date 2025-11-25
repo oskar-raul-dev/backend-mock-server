@@ -1,0 +1,15 @@
+{
+    "success": true,
+    "product": {
+        "id": "{{ BODY_PROCESSED.product_id }}",
+        "name": "{{ BODY_PROCESSED.name }}",
+        "sku": "{{ BODY_PROCESSED.sku }}",
+        "price": {{ BODY_PROCESSED.price }},
+        "category": "{{ BODY_PROCESSED.category }}",
+        "stock": {{ BODY_PROCESSED.stock }},
+        "priceFormatted": "{{ BODY_PROCESSED.price_formatted }}",
+        "inStock": {{ BODY_PROCESSED.in_stock }},
+        "createdAt": "{{ BODY_PROCESSED.timestamp }}"
+    },
+    "message": "Product {{ BODY_PROCESSED.name }} created successfully with SKU {{ BODY_PROCESSED.sku }}"
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<request>
+    <transactionId>TXN-001</transactionId>
+    <merchantId>MERCHANT-123</merchantId>
+    <amount>150.50</amount>
+</request>

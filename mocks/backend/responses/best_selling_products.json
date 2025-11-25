@@ -1,0 +1,34 @@
+{
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "title": "Manzana Roja",
+            "slug": "manzana-roja",
+            "price": "2.50",
+            "currency": "USD",
+            "is_available": true,
+            "sales_count": 150
+        },
+        {
+            "id": 2,
+            "title": "Leche Entera 1L",
+            "slug": "leche-entera-1l",
+            "price": "1.80",
+            "currency": "USD",
+            "is_available": true,
+            "sales_count": 120
+        },
+        {
+            "id": 3,
+            "title": "Pan Campesino",
+            "slug": "pan-campesino",
+            "price": "1.20",
+            "currency": "USD",
+            "is_available": true,
+            "sales_count": 100
+        }
+    ]
+}

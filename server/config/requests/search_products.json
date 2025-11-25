@@ -1,0 +1,11 @@
+{
+    "filters": {
+        "category": "electronics",
+        "minPrice": "10.00",
+        "maxPrice": "100.00"
+    },
+    "pagination": {
+        "page": "1",
+        "limit": "10"
+    }
+}

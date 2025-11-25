@@ -1,0 +1,57 @@
+{
+    "count": 5,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "name": "Frutas y Verduras",
+            "slug": "frutas-y-verduras",
+            "description": "Productos frescos del campo",
+            "image": null,
+            "is_active": true,
+            "depth": 1,
+            "numchild": 3
+        },
+        {
+            "id": 2,
+            "name": "Carnes",
+            "slug": "carnes",
+            "description": "Carnes frescas y procesadas",
+            "image": null,
+            "is_active": true,
+            "depth": 1,
+            "numchild": 2
+        },
+        {
+            "id": 3,
+            "name": "Lácteos",
+            "slug": "lacteos",
+            "description": "Productos lácteos frescos",
+            "image": null,
+            "is_active": true,
+            "depth": 1,
+            "numchild": 4
+        },
+        {
+            "id": 4,
+            "name": "Panadería",
+            "slug": "panaderia",
+            "description": "Pan fresco y repostería",
+            "image": null,
+            "is_active": true,
+            "depth": 1,
+            "numchild": 2
+        },
+        {
+            "id": 5,
+            "name": "Bebidas",
+            "slug": "bebidas",
+            "description": "Bebidas y refrescos",
+            "image": null,
+            "is_active": true,
+            "depth": 1,
+            "numchild": 3
+        }
+    ]
+}

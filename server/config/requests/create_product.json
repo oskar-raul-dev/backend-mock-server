@@ -1,0 +1,13 @@
+{
+    "product": {
+        "name": "Sample Product",
+        "sku": "PROD123",
+        "price": "29.99",
+        "category": "electronics",
+        "stock": "100"
+    },
+    "metadata": {
+        "source": "api",
+        "timestamp": "2024-01-01T00:00:00Z"
+    }
+}

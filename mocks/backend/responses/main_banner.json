@@ -1,0 +1,8 @@
+{
+    "id": 1,
+    "title": "Gran Promoción",
+    "subtitle": "Hasta 40% de descuento en productos seleccionados",
+    "image": "https://via.placeholder.com/1200x300",
+    "link": "/promociones",
+    "is_active": true
+}

@@ -1,0 +1,37 @@
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "uuid": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "name": "Granja El Bosque",
+            "address": "Av. P.º Cuatricentenario, Valencia 2001, Carabobo",
+            "latitude": "10.1946907",
+            "longitude": "-68.0229245",
+            "is_active": true,
+            "max_distance": 15,
+            "retail": {
+                "id": 1,
+                "uuid": "8d574f1f-8b70-449f-85f8-b0baeb6eb4c7",
+                "name": "Granja"
+            }
+        },
+        {
+            "id": 2,
+            "uuid": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+            "name": "Granja Av. Bolivar",
+            "address": "Avenida Bolivar Norte, Valencia",
+            "latitude": "10.207109",
+            "longitude": "-68.007699",
+            "is_active": true,
+            "max_distance": 10,
+            "retail": {
+                "id": 1,
+                "uuid": "8d574f1f-8b70-449f-85f8-b0baeb6eb4c7",
+                "name": "Granja"
+            }
+        }
+    ]
+}

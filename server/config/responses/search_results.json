@@ -1,0 +1,15 @@
+{
+    "success": true,
+    "filters": {
+        "category": "{{ BODY_PROCESSED.category }}",
+        "priceRange": "{{ BODY_PROCESSED.price_range }}"
+    },
+    "pagination": {
+        "page": {{ BODY_PROCESSED.page }},
+        "limit": {{ BODY_PROCESSED.limit }},
+        "totalPages": {{ BODY_PROCESSED.total_pages }},
+        "totalResults": {{ BODY_PROCESSED.total_results }}
+    },
+    "results": {{ BODY_PROCESSED.mock_results }},
+    "message": "Found {{ BODY_PROCESSED.total_results }} products in category {{ BODY_PROCESSED.category }}"
+}

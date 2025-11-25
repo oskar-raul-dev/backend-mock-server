@@ -1,0 +1,25 @@
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "code": "GRANJA",
+            "name": "Granja del Mercado",
+            "is_active": true,
+            "locations": [
+                {
+                    "id": 1,
+                    "name": "Granja El Bosque",
+                    "address": "Av. P.º Cuatricentenario, Valencia"
+                },
+                {
+                    "id": 2,
+                    "name": "Granja Av. Bolivar",
+                    "address": "Avenida Bolivar Norte, Valencia"
+                }
+            ]
+        }
+    ]
+}

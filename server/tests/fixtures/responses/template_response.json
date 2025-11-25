@@ -1,0 +1,5 @@
+{
+  "user_id": "{{ PATH_PARAMS[0] }}",
+  "query": "{{ QUERY_PARAMS.q }}",
+  "auth": "{{ HEADERS.authorization }}"
+}

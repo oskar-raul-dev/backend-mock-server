@@ -1,0 +1,52 @@
+{
+    "count": 3,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "title": "Manzana Roja",
+            "slug": "manzana-roja",
+            "description": "Manzanas rojas frescas del campo",
+            "price": "2.50",
+            "currency": "USD",
+            "stock": 100,
+            "is_available": true,
+            "category": {
+                "id": 1,
+                "name": "Frutas y Verduras"
+            },
+            "images": []
+        },
+        {
+            "id": 2,
+            "title": "Leche Entera 1L",
+            "slug": "leche-entera-1l",
+            "description": "Leche entera pasteurizada",
+            "price": "1.80",
+            "currency": "USD",
+            "stock": 50,
+            "is_available": true,
+            "category": {
+                "id": 3,
+                "name": "Lácteos"
+            },
+            "images": []
+        },
+        {
+            "id": 3,
+            "title": "Pan Campesino",
+            "slug": "pan-campesino",
+            "description": "Pan artesanal recién horneado",
+            "price": "1.20",
+            "currency": "USD",
+            "stock": 30,
+            "is_available": true,
+            "category": {
+                "id": 4,
+                "name": "Panadería"
+            },
+            "images": []
+        }
+    ]
+}

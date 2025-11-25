@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<updateOrderRequest>
+    <order>
+        <orderId>12345</orderId>
+        <status>pending</status>
+        <items>
+            <item>
+                <productId>101</productId>
+                <quantity>1</quantity>
+                <price>10.00</price>
+            </item>
+        </items>
+    </order>
+</updateOrderRequest>

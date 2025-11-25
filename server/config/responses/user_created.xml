@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<createUserResponse>
+    <success>true</success>
+    <user>
+        <id>{{ BODY_PROCESSED.user_id }}</id>
+        <firstName>{{ BODY_PROCESSED.first_name }}</firstName>
+        <lastName>{{ BODY_PROCESSED.last_name }}</lastName>
+        <email>{{ BODY_PROCESSED.email }}</email>
+        <fullName>{{ BODY_PROCESSED.full_name }}</fullName>
+        <ageGroup>{{ BODY_PROCESSED.age_group }}</ageGroup>
+        <createdAt>{{ BODY_PROCESSED.timestamp }}</createdAt>
+    </user>
+    <metadata>
+        <source>{{ BODY_PROCESSED.source }}</source>
+        <processedBy>mockserver</processedBy>
+    </metadata>
+</createUserResponse>

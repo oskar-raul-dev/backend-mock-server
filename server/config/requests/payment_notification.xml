@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<paymentNotification>
+    <transaction>
+        <transactionId>ABC1234567890</transactionId>
+        <amount>100.00</amount>
+        <currency>USD</currency>
+        <status>approved</status>
+        <customer>
+            <customerId>12345</customerId>
+            <email>customer@example.com</email>
+        </customer>
+    </transaction>
+</paymentNotification>
