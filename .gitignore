@@ -211,6 +211,9 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# VS Code Workspaces
+*.code-workspace
+
 # Claude Code
 .claude/
 CLAUDE.md
