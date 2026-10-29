@@ -213,7 +213,3 @@ __marimo__/
 
 # VS Code Workspaces
 *.code-workspace
-
-# Claude Code
-.claude/
-CLAUDE.md
